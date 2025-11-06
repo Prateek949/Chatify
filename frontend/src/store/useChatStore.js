@@ -48,15 +48,27 @@ export const useChatStore = create((set,get)=>({
       set({ isUserLoading: false });
     }
     },
+
     getMessagesByUserId: async (userId)=> {
       set({ isMessageLoading : true})
       try {
         const res= await axiosInstance.get(`/messages/${userId}`);
-        set({message: res.data });
+        set({messages: res.data });
       } catch (error) {
         toast.error(error.response.data.message || "Something went wrong");
       }finally{
         set({isMessageLoading:false});
       }
     },
+
+    sendMessage: async(messageData) =>{
+      const {selectedUser} = get();
+      try {
+        const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`,messageData)
+        set({messages:get().messages.concat(res.data)})
+      } catch (error) {
+        toast.error(error?.response?.data?.message || "Something went wrong");
+      }
+    },
+
 }))
