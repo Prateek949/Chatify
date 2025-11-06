@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
+
 export const useChatStore = create((set,get)=>({
     allContacts: [],
     chats: [],
@@ -10,12 +11,17 @@ export const useChatStore = create((set,get)=>({
     isUserLoading: false,
     isMessageLoading:false,
     isSoundEnabled: JSON.parse(localStorage.getItem("isSoundEnabled")) === true,
+
+  
     toggleSound: () => {
         localStorage.setItem("isSoundEnabled", !get().isSoundEnabled)
         set({isSoundEnabled: !get().isSoundEnabled})
     },
+
     setActiveTab: (tab) => set({activeTab:tab}),
     setSelectedUser: (selectedUser) => set({selectedUser}),
+
+
     getAllContact: async () => {
     set({ isUserLoading: true });
         try {
@@ -42,4 +48,27 @@ export const useChatStore = create((set,get)=>({
       set({ isUserLoading: false });
     }
     },
+
+    getMessagesByUserId: async (userId)=> {
+      set({ isMessageLoading : true})
+      try {
+        const res= await axiosInstance.get(`/messages/${userId}`);
+        set({messages: res.data });
+      } catch (error) {
+        toast.error(error.response.data.message || "Something went wrong");
+      }finally{
+        set({isMessageLoading:false});
+      }
+    },
+
+    sendMessage: async(messageData) =>{
+      const {selectedUser} = get();
+      try {
+        const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`,messageData)
+        set({messages:get().messages.concat(res.data)})
+      } catch (error) {
+        toast.error(error?.response?.data?.message || "Something went wrong");
+      }
+    },
+
 }))

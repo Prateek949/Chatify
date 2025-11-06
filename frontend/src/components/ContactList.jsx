@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 import {useChatStore} from '../store/useChatStore'
 import UsersLoadingSkeleton from './UserLoadingSkeleton';
-import NoChatsFound from './NoChatsFound';
 
 function ContactList() {
   const { getAllContact, allContacts , isUserLoading, setSelectedUser }= useChatStore();
@@ -10,7 +9,7 @@ function ContactList() {
     getAllContact()
   },[getAllContact]);
   if(isUserLoading){return <UsersLoadingSkeleton/>}
-  if(chats.length === 0) return <NoChatsFound />;
+
   return (
     <>
       {allContacts.map((contact) => (
