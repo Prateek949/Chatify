@@ -11,7 +11,7 @@ import cors from 'cors';
 
 
 const app= express();
-app.use(express.json()); //req.body
+app.use(express.json({limit:"5mb"})); //req.body
 const ___dirname = path.resolve();
 
 
