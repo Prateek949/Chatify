@@ -1,16 +1,20 @@
-import { useEffect } from 'react';
-import {useChatStore} from '../store/useChatStore'
-import UsersLoadingSkeleton from './UserLoadingSkeleton';
-import NoChatsFound from './NoChatsFound';
+import { useEffect } from "react";
+import { useChatStore } from "../store/useChatStore";
+import UsersLoadingSkeleton from "./UserLoadingSkeleton";
+import NoChatsFound from "./NoChatsFound";
+import { useAuthStore } from "../store/useAuthStore";
 
-function ChatList() {
-  const { getMyChatPartners, chats , isUserLoading, setSelectedUser }= useChatStore();
+function ChatsList() {
+  const { getMyChatPartners, chats, isUsersLoading, setSelectedUser } = useChatStore();
+  const { onlineUsers } = useAuthStore();
 
-  useEffect(() =>{
-    getMyChatPartners()
-  },[getMyChatPartners]);
-  if(isUserLoading){return <UsersLoadingSkeleton/>}
-  if(chats.length === 0) return <NoChatsFound />;
+  useEffect(() => {
+    getMyChatPartners();
+  }, [getMyChatPartners]);
+
+  if (isUsersLoading) return <UsersLoadingSkeleton />;
+  if (chats.length === 0) return <NoChatsFound />;
+
   return (
     <>
       {chats.map((chat) => (
@@ -20,8 +24,7 @@ function ChatList() {
           onClick={() => setSelectedUser(chat)}
         >
           <div className="flex items-center gap-3">
-            {/**todo:FIX THIS ONLINE STATUS AND MAKE IT WORK WITH SOCKET */}
-            <div className={`avatar online`}>
+            <div className={`avatar ${onlineUsers.includes(chat._id) ? "online" : "offline"}`}>
               <div className="size-12 rounded-full">
                 <img src={chat.profilePic || "/avatar.png"} alt={chat.fullName} />
               </div>
@@ -31,7 +34,6 @@ function ChatList() {
         </div>
       ))}
     </>
-  )
+  );
 }
-
-export default ChatList
+export default ChatsList;
