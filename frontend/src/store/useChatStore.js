@@ -63,7 +63,7 @@ export const useChatStore = create((set,get)=>({
     },
 
     sendMessage: async(messageData) =>{
-      const {selectedUser} = get();
+     const { selectedUser, messages } = get();
     const {authUser}=  useAuthStore.getState();
     const tempId = `temp-${Date.now()}`
 
@@ -75,7 +75,6 @@ export const useChatStore = create((set,get)=>({
       image: messageData.image,
       createdAt: new Date().toISOString(),
       isOptimistic: true,
-
     };
     //immediately update the ui by adding the message
    set({messages: [...get().messages, optimisticMessage] });
@@ -84,6 +83,7 @@ export const useChatStore = create((set,get)=>({
       try {
         const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`,messageData)
         set({messages:get().messages.map(msg => msg._id === tempId ? res.data : msg)})
+        
       } catch (error) {
         //removing the optimistic message on failure
         set({messages: get().messages.filter(msg => msg._id !== tempId)})
